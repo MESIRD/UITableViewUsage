@@ -35,8 +35,8 @@
     UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(_editTableView)];
     self.navigationItem.rightBarButtonItem = editButton;
     
-    _tableView.allowsMultipleSelection = YES;
-    _tableView.allowsMultipleSelectionDuringEditing = YES;
+//    _tableView.allowsMultipleSelection = YES;
+//    _tableView.allowsMultipleSelectionDuringEditing = YES;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -53,6 +53,10 @@
         _tableView.editing = YES;
     }
     [_tableView endUpdates];
+}
+
+- (void)_reloadIndexPath:(NSIndexPath *)indexPath {
+    
 }
 
 #pragma mark - table view delegate & data source
@@ -73,7 +77,7 @@
     
     // any additional configuration
     cell.textLabel.text = _items[indexPath.row];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
 }
 
@@ -82,26 +86,72 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     return 45.0f;
 }
 
--(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+#pragma mark Editing
+
+- (void)tableView:(UITableView *)tableView willBeginEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"Will Begin Editing");
+}
+
+- (void)tableView:(UITableView *)tableView didEndEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"Did End Editing");
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewCellEditingStyleDelete;
+}
+
+- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+// this method won't be called if editActionForRowAtIndexPath is implemented
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [_items removeObjectAtIndex:indexPath.row];
+        [_tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
 }
 
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
     
+    __weak typeof(self) weakSelf = self;
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        NSLog(@"Removed!");
+        [weakSelf.items removeObjectAtIndex:indexPath.row];
+        [weakSelf.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }];
     
-    __weak typeof(self) weakSelf = self;
     UITableViewRowAction *foldAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Fold" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [weakSelf _editTableView];
+        UITableViewCell *cell = [weakSelf.tableView cellForRowAtIndexPath:indexPath];
+//        [weakSelf.tableView beginUpdates];
+        [cell setEditing:NO animated:YES];
+//        [weakSelf.tableView endUpdates];
     }];
     
     return @[foldAction, removeAction];
 }
+
+#pragma mark Reordering
+
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    
+    // change the order of source and destination in data source
+    id temp = _items[sourceIndexPath.row];
+    _items[sourceIndexPath.row] = _items[destinationIndexPath.row];
+    _items[destinationIndexPath.row] = temp;
+}
+
+
 
 @end
