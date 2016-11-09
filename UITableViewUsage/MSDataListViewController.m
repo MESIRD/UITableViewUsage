@@ -100,11 +100,11 @@
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return UITableViewCellEditingStyleDelete;
+    return UITableViewCellEditingStyleNone;
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    return NO;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -128,14 +128,7 @@
         [weakSelf.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }];
     
-    UITableViewRowAction *foldAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Fold" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        UITableViewCell *cell = [weakSelf.tableView cellForRowAtIndexPath:indexPath];
-//        [weakSelf.tableView beginUpdates];
-        [cell setEditing:NO animated:YES];
-//        [weakSelf.tableView endUpdates];
-    }];
-    
-    return @[foldAction, removeAction];
+    return @[removeAction];
 }
 
 #pragma mark Reordering
