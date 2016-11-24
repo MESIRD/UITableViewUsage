@@ -9,6 +9,7 @@
 #import "ViewController.h"
 
 #import "MSDataListViewController.h"
+#import "MSDynamicHeightViewController.h"
 
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -64,7 +65,8 @@
         MSDataListViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"MSDataListViewController"];
         [self.navigationController pushViewController:vc animated:YES];
     } else if (indexPath.row == 1) {
-        
+        MSDynamicHeightViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"MSDynamicHeightViewController"];
+        [self.navigationController pushViewController:vc animated:YES];
     } else if (indexPath.row == 2) {
         
     }
